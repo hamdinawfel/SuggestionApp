@@ -3,7 +3,7 @@ using MongoDB.Driver;
 
 namespace SuggestionAppLibrary.DataAccess
 {
-    public class DbConnetion
+    public class DbConnetion : IDbConnetion
     {
         private readonly IConfiguration _config;
         private readonly IMongoDatabase _db;
@@ -25,6 +25,15 @@ namespace SuggestionAppLibrary.DataAccess
         {
             _config = config;
             Client = new MongoClient(_config.GetConnectionString(_connectionId));
+            DbName = _config["DatabaseName"];
+            _db = Client.GetDatabase(DbName);
+
+            CategoryCollection = _db.GetCollection<CategoryModel>(CategoryCollectionName);
+            StatusCollection = _db.GetCollection<SuggestionModel>(StatusCollectionName);
+            UserCollection = _db.GetCollection<UserModel>(UserCollectionName);
+            SuggestionCollection = _db.GetCollection<SuggestionModel>(SuggestionsCollectionName);
+
         }
     }
+
 }
