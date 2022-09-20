@@ -27,7 +27,7 @@
             return results.FirstOrDefault();
         }
 
-        public Task CrateUser(UserModel user)
+        public Task CreateUser(UserModel user)
         {
             return _users.InsertOneAsync(user);
         }
