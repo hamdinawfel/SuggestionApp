@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SuggestionAppLibrary.DataAccess
 {
-    public class MongoSuggestionData
+    public class MongoSuggestionData : ISuggestionData
     {
         private readonly IDbConnetion _db;
         private readonly IMongoCollection<SuggestionModel> _suggestions;
