@@ -8,7 +8,7 @@ namespace SuggestionAppLibrary.DataAccess
         private readonly IUserData _userData;
         private readonly IMemoryCache _cache;
 
-        private const string CacheName = "StatusData";
+        private const string CacheName = "SuggestionData";
 
         public MongoSuggestionData(IDbConnetion db, IUserData userData, IMemoryCache cache )
         {
@@ -30,7 +30,6 @@ namespace SuggestionAppLibrary.DataAccess
             }
             return output;
         }
-
         public async Task<List<SuggestionModel>> GetAllApprovedSuggestion()
         {
             var output = await GetAllSuggestions();
@@ -41,19 +40,16 @@ namespace SuggestionAppLibrary.DataAccess
             var results = await _suggestions.FindAsync(s => s.Id == id);
             return results.FirstOrDefault();
         }
-
         public async Task<List<SuggestionModel>> GetAllSuggestionWaitingForApproval()
         {
             var output = await GetAllSuggestions();
             return output.Where(s => s.ApprovedForRelease == false && s.Rejected == false).ToList();
         }
-       
         public async Task UpdateSuggestion(SuggestionModel suggestion)
         {
             await _suggestions.ReplaceOneAsync(s => s.Id == suggestion.Id,suggestion);
             _cache.Remove(CacheName);
         }
-
         public async Task UpvoteSuggestion(string suggestionId, string userId)
         {
             var client = _db.Client;
