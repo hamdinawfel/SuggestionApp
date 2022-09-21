@@ -21,6 +21,16 @@
         <input type="text" placeholder="Search" aria-label="Search box" @oninput="(txt) => OnSearchInput((string)txt.Value)" />
     </div>
 </div>
+<div>
+    <div>
+        @if (suggestions is not null)
+        {
+            <Virtualize Items="@suggestions" Context="s" OverscanCount="10">
+
+            </Virtualize>
+        }
+    </div>
+</div>
 
 
 @code
