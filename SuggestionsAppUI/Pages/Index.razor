@@ -26,12 +26,59 @@
         @if (suggestions is not null)
         {
             <Virtualize Items="@suggestions" Context="s" OverscanCount="10">
-
+                <div>
+                    <div>
+                        <div>@GetUpVoteTopText(s)</div>
+                        <span class="oi oi-caret-top"></span>
+                        <div>@GetUpVoteBottomText(s)</div>
+                    </div>
+                    <div>
+                        <div @onclick="(() => OpenDetails(s))">
+                            @s.Suggestion
+                        </div>
+                        <div>
+                            <div @onclick="(()=>OpenDetails(s))">
+                                @s.Category?.CategoryName
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div>
+                            @s.SuggestionStatus
+                        </div>
+                    </div>
+                </div>
             </Virtualize>
         }
     </div>
 </div>
+<div>
+    @if (categories is not null)
+    {
+        <div>
+            <span>Categories</span>
+            <div @onclick="(()=>OnCategoryClick())">All</div>
+            @foreach (CategoryModel c in categories)
+            {
+                <div @onclick="(()=>OnCategoryClick(c.CategoryName))">@c.CategoryName</div>
+            }
+        </div>
+    }
+</div>
 
+<div>
+    @if (statuses is not null)
+    {
+        <div>
+            <span>Status</span>
+            <div @onclick="(()=>OnStatus())">All</div>
+            @foreach (StatusModel s in statuses)
+            {
+                <div @onclick="(()=>OnStatus(s.StatusName))">@s.StatusName</div>
+            }
+        </div>
+    }
+</div>
 
 @code
 {
@@ -130,6 +177,7 @@
         searchText = inputText;
         await FilterSuggestion();
     }
+   
     protected async Task OnCategoryClick(string category = "All")
     {
         selectedCategory = category;
@@ -140,7 +188,7 @@
         searchText = status;
         await FilterSuggestion();
     }
-    protected string GetUpVoteToText(SuggestionModel suggestion)
+    protected string GetUpVoteTopText(SuggestionModel suggestion)
     {
         if (suggestion.UserVotes?.Count > 0)
         {
