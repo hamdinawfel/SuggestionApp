@@ -17,7 +17,7 @@ namespace SuggestionAppLibrary.DataAccess
 
         public MongoClient Client { get; private set; }
         public IMongoCollection<CategoryModel> CategoryCollection { get; set; }
-        public IMongoCollection<SuggestionModel> StatusCollection { get; set; }
+        public IMongoCollection<StatusModel> StatusCollection { get; set; }
         public IMongoCollection<UserModel> UserCollection { get; set; }
         public IMongoCollection<SuggestionModel> SuggestionCollection { get; set; }
 
@@ -29,7 +29,7 @@ namespace SuggestionAppLibrary.DataAccess
             _db = Client.GetDatabase(DbName);
 
             CategoryCollection = _db.GetCollection<CategoryModel>(CategoryCollectionName);
-            StatusCollection = _db.GetCollection<SuggestionModel>(StatusCollectionName);
+            StatusCollection = _db.GetCollection<StatusModel>(StatusCollectionName);
             UserCollection = _db.GetCollection<UserModel>(UserCollectionName);
             SuggestionCollection = _db.GetCollection<SuggestionModel>(SuggestionsCollectionName);
 
