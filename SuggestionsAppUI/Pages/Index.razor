@@ -1,9 +1,140 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+@inject ICategoryData CategoryData
+@inject IStatusData StatusData
+@inject ISuggestionData SuggestionData
 
-<h1>Hello, world!</h1>
+@inject NavigationManager NavManager
+@inject ProtectedSessionStorage sessionStorage
 
-Welcome to your new app.
+@code
+{
+    private List<CategoryModel> categories;
+    private List<SuggestionModel> suggestions;
+    private List<StatusModel> statuses;
 
+    private string selectedCategory = "All";
+    private string selectedStatus = "All";
+    private string searchText = "";
+    bool isSortedByNew = true;
 
+    protected async override Task OnInitializedAsync()
+    {
+        categories = await CategoryData.GetAllCategories();
+        statuses = await StatusData.GetAllStatuses();
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadFilterState();
+            await FilterSuggestion();
+            ShouldRender();
+        }
+    }
+
+    protected async Task LoadFilterState()
+    {
+        var stringResults = await sessionStorage.GetAsync<string>(nameof(selectedCategory));
+        selectedCategory = stringResults.Success ? stringResults.Value : "All";
+
+        stringResults = await sessionStorage.GetAsync<string>(nameof(selectedStatus));
+        selectedStatus = stringResults.Success ? stringResults.Value : "All";
+
+        stringResults = await sessionStorage.GetAsync<string>(nameof(searchText));
+        searchText = stringResults.Success ? stringResults.Value : "";
+
+        var boolResults = await sessionStorage.GetAsync<bool>(nameof(isSortedByNew));
+        isSortedByNew = boolResults.Success ? boolResults.Value : true;
+    }
+
+    protected async Task SaveFilterState()
+    {
+        await sessionStorage.SetAsync(nameof(selectedCategory), selectedCategory);
+        await sessionStorage.SetAsync(nameof(selectedStatus), selectedStatus);
+        await sessionStorage.SetAsync(nameof(searchText), searchText);
+        await sessionStorage.SetAsync(nameof(isSortedByNew), isSortedByNew);
+    }
+
+    protected async Task FilterSuggestion()
+    {
+        var output = await SuggestionData.GetAllApprovedSuggestion();
+
+        if (selectedCategory != "All")
+        {
+            output = output.Where(s => s.Category?.CategoryName == selectedCategory).ToList();
+        }
+
+        if (selectedStatus != "All")
+        {
+            output = output.Where(s => s.SuggestionStatus?.StatusName == selectedStatus).ToList();
+        }
+
+        if (string.IsNullOrWhiteSpace(searchText) == false)
+        {
+            output = output.Where(s => 
+                s.Suggestion.Contains(searchText, StringComparison.CurrentCultureIgnoreCase) || 
+                s.Description.Contains(searchText,StringComparison.CurrentCultureIgnoreCase)
+             ).ToList();
+        }
+
+        if (isSortedByNew)
+        {
+            output = output.OrderByDescending(s => s.DateCreated).ToList();
+        }
+        else
+        {
+            output = output.OrderByDescending(s => s.UserVotes.Count).ThenByDescending(s => s.DateCreated).ToList();
+        }
+
+        suggestions = output;
+
+        await SaveFilterState();
+    }
+
+    protected async Task OrderByNew(bool isNew)
+    {
+        isSortedByNew = isNew;
+        await FilterSuggestion();
+    }
+
+    protected async Task OnSearchInput(string inputText)
+    {
+        searchText = inputText;
+        await FilterSuggestion();
+    }
+    protected async Task OnCategoryClick(string category = "All")
+    {
+        selectedCategory = category;
+        await FilterSuggestion();
+    }
+    protected async Task OnStatus(string status = "All")
+    {
+        searchText = status;
+        await FilterSuggestion();
+    }
+    protected string GetUpVoteToText(SuggestionModel suggestion)
+    {
+        if (suggestion.UserVotes?.Count > 0)
+        {
+            return suggestion.UserVotes.Count().ToString("00");
+        }
+        else
+        {
+            return "Click To";
+        }
+    }
+
+    protected string GetUpVoteBottomText(SuggestionModel suggestion)
+    {
+        if (suggestion.UserVotes?.Count > 1)
+        {
+            return "UpVotes";
+        }
+        else
+        {
+            return "UpVote";
+        }
+    }
+}
