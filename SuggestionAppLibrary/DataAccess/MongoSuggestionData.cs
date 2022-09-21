@@ -1,10 +1,4 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace SuggestionAppLibrary.DataAccess
 {
     public class MongoSuggestionData : ISuggestionData
@@ -19,7 +13,7 @@ namespace SuggestionAppLibrary.DataAccess
         public MongoSuggestionData(IDbConnetion db, IUserData userData, IMemoryCache cache )
         {
             _db = db;
-            _userData = _userData;
+            _userData = userData;
             _suggestions = _db.SuggestionCollection;
             _cache = cache;
         }
