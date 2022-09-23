@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Extensions.Azure;
 using SuggestionsAppUI;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,16 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRewriter(
+    new RewriteOptions().Add(
+        context =>
+        {
+            if (context.HttpContext.Request.Path == "MicrosotIdentity/Account/SignOut")
+            {
+                context.HttpContext.Response.Redirect("/");
+            }
+        }));
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
