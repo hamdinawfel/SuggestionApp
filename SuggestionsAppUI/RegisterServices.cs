@@ -15,7 +15,13 @@ namespace SuggestionsAppUI
             builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAdB2C"));
 
-
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireClaim("jobTitle", "Admin");
+                });
+            });
 
             builder.Services.AddSingleton<IDbConnetion, DbConnetion>();
             builder.Services.AddSingleton<ICategoryData, MongoCategoryData>();
