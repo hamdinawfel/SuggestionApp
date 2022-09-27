@@ -80,10 +80,10 @@ namespace SuggestionAppLibrary.DataAccess
                     suggestion.UserVotes.Remove(userId);
                 }
 
-                await suggestionInTransaction.ReplaceOneAsync(s => s.Id == suggestionId, suggestion);
+                await suggestionInTransaction.ReplaceOneAsync(session,s => s.Id == suggestionId, suggestion);
 
                 var userInTransaction = db.GetCollection<UserModel>(_db.UserCollectionName);
-                var user = await _userData.GetUserAsync(suggestion.Author.Id);
+                var user = await _userData.GetUserAsync(userId);
 
                 if (isVoted)
                 {
@@ -95,7 +95,7 @@ namespace SuggestionAppLibrary.DataAccess
                     user.VotedOnSuggestions.Remove(suggestionToRemove);
                 }
 
-                await userInTransaction.ReplaceOneAsync(u => u.Id == userId, user);
+                await userInTransaction.ReplaceOneAsync(session, u => u.Id == userId, user);
                 await session.CommitTransactionAsync();
                 _cache.Remove(CacheName);
 
@@ -121,7 +121,7 @@ namespace SuggestionAppLibrary.DataAccess
                 var user = await _userData.GetUserAsync(suggestion.Author.Id);
 
                 user.VotedOnSuggestions.Add(new BasicSuggestionModel(suggestion));
-                await userInTransaction.ReplaceOneAsync(u => u.Id == user.Id, user);
+                await userInTransaction.ReplaceOneAsync(session, u => u.Id == user.Id, user);
                 await session.CommitTransactionAsync();
             }
             catch (Exception ex)
