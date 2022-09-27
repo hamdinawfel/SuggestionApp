@@ -1,6 +1,8 @@
 ﻿@page "/Details/{Id}"
 
+@inject AuthenticationStateProvider authProvider
 @inject ISuggestionData SuggestionData
+@inject IUserData UserData
 @inject NavigationManager navManager
 
 <h3>Suggestion Details</h3>
@@ -11,7 +13,7 @@
         {
             <div>
                 <div>
-                    <div>
+                    <div @onclick="VoteUp">
                         <div>@GetUpVoteTopText()</div>
                         <span class="oi oi-caret-top"></span>
                         <div>@GetUpVoteBottomText()</div>
@@ -56,11 +58,16 @@
 
     [Parameter]
     public string Id { get; set; }
+    private UserModel loggedInUser;
+
 
     protected async override Task OnInitializedAsync()
     {
         suggestion = await SuggestionData.GetSuggestion(Id);
+        loggedInUser = await authProvider.GetUserFromAuth(UserData);
     }
+
+   
 
     protected string GetUpVoteTopText()
     {
@@ -70,7 +77,14 @@
         }
         else
         {
-            return "Click To";
+            if (suggestion.Author.Id == loggedInUser?.Id)
+            {
+                return "Awaiting";
+            }
+            else
+            {
+                return "Click To";
+            }
         }
     }
 
@@ -83,6 +97,30 @@
         else
         {
             return "UpVote";
+        }
+    }
+
+    private  async Task VoteUp()
+    {
+        if (loggedInUser is not null)
+        {
+            if (suggestion.Author.Id == loggedInUser.Id)
+            {
+             // Can't vote your own suggestion
+                return;
+            }
+            if (suggestion.UserVotes.Add(loggedInUser.Id) == false)
+            {
+                suggestion.UserVotes.Remove(loggedInUser.Id);
+
+            }
+
+            await SuggestionData.UpvoteSuggestion(suggestion.Id, loggedInUser.Id);
+          
+        }
+        else
+        {
+            navManager.NavigateTo("/MicrosoftIdentity/Account/SignIn", true);
         }
     }
 
