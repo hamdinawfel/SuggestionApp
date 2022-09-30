@@ -12,7 +12,8 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff;
 }
 body {
-    background: url(../images/page-background.png) no-repeat center center fixed;
+    /*background: url(../images/page-background.png) no-repeat center center fixed;*/
+    background: #43302e no-repeat center center fixed;
     background-size: cover;
     height: 100%;
 }
@@ -24,7 +25,13 @@ h1:focus {
 }
 
 a, .btn-link {
-    color: #0071c1;
+    color: #fff;
+    text-decoration: none;
+}
+
+a:hover, .btn-link:hover {
+    color: #fff;
+    text-decoration: underline;
 }
 
 .btn-primary {
@@ -132,7 +139,7 @@ a, .btn-link {
 }
 
 .search-box {
-    --bs-gutter-x: 3.5rem; /* ??? */
+    --bs-gutter-x: 3.5rem;
 }
 
 .rounded-control {
@@ -227,6 +234,7 @@ a, .btn-link {
 
 .suggestion-entry-text {
     display: flex;
+    justify-content:space-between;
     flex-direction: column;
     padding: 10px;
     padding-left: 20px;
