@@ -93,7 +93,9 @@
                 <div @onclick="(()=>OnStatusClick())" class="@GetSelectedStatus()">All</div>
                 @foreach (StatusModel s in statuses)
                 {
-                    <div @onclick="(()=>OnStatusClick(s.StatusName))" class="@GetSelectedStatus(s.StatusName)">@s.StatusName</div>
+                    <div @onclick="(()=>OnStatusClick(s.StatusName))" class="@GetSelectedStatus(s.StatusName)">
+                        <p class="text-capitalize">@s.StatusName</p>
+                    </div>
                 }
             </div>
         }
